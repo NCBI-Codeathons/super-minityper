@@ -1,2 +1,6 @@
-# LR_SV
-Long Read SVs
+# Graphs on GPUs
+
+
+## Workflow
+
+![](docs/images/workflow.png)
