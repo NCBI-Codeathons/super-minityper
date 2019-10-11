@@ -3,4 +3,4 @@
 
 ## Workflow
 
-![](images/workflow.png)
+![](docs/images/workflow.png)
