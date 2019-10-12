@@ -77,7 +77,7 @@ useful if no reference genome is available.
 
 ## Workflow progress
 
-### Read-to-graph alignment [**DONE**]
+### Read-to-graph alignment [**90% Complete**]
 
 fast(a/q) + GFA :arrow_right: minigraph :arrow_right: GAF (graph alignments)
 
@@ -93,7 +93,7 @@ map those reads to the graph.
 
 ![DXSMTRUN](https://raw.githubusercontent.com/NCBI-Codeathons/super-minityper/edawson/docs/images/dnanexus_smt.png)
 
-### Fast graph construction from a reference genome + SV calls :fire::zap::cloud: [**DONE**]
+### Fast graph construction from a reference genome + SV calls :fire::zap::cloud: [**90% Complete**]
 
 VCF + fast(a/q) :arrow_right: :cloud: svaha2 :cloud: :arrow_right: GFA 
 
