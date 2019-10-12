@@ -50,6 +50,7 @@ Path in graph      :           ------------------------------------
 ```
 
 Because a path exists in the graph, the read can be mapped exactly to the variant path.
+the soft-clipped portion now maps to the portion of the genome where it belongs.
 
 This means that, given a graph of either known variants or long reads,
 we can tell whether a new set of (long or short) reads contains that variant.
