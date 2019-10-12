@@ -91,7 +91,7 @@ We also compiled it to DNAnexus using dxWDL. The tool is called SuperMiniTyper.
 **SuperMiniTyper**: Given a set of reads and a graph (possibly containing SV calls),
 map those reads to the graph.
 
-![DXSMTRUN](docs/images/dnanexus_smt.png)
+![DXSMTRUN](https://raw.githubusercontent.com/NCBI-Codeathons/super-minityper/edawson/docs/images/dnanexus_smt.png)
 
 ### Fast graph construction from a reference genome + SV calls :fire::zap::cloud: [**DONE**]
 
