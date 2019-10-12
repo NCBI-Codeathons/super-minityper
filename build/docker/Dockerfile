@@ -88,6 +88,35 @@ RUN git clone --recursive -b ${RACON_GPU_VERSION} --single-branch https://github
 
 
 ###############################################################################
+# Minimap2
+###############################################################################
+FROM ${LINUX_DISTRO}:${LINUX_DISTRO_VERSION} AS minimap2
+
+ARG MINIMAP2_VERSION=v2.17
+ENV MINIMAP2_VERSION=${MINIMAP2_VERSION}
+
+# Ensure apt-get won't prompt for selecting options
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+# Install dependencies for htslib and Clara Genomics SDK
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        git \
+        build-essential \
+        make \
+        zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/lh3/minimap2/build
+
+RUN git clone --recursive -b ${MINIMAP2_VERSION} --single-branch https://github.com/lh3/minimap2.git \
+    && cd minimap2 \
+    && make
+
+
+###############################################################################
 # Minigraph
 ###############################################################################
 FROM ${LINUX_DISTRO}:${LINUX_DISTRO_VERSION} AS minigraph
@@ -100,8 +129,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-WORKDIR /opt/lh3/minigraph/build
-
 # Install dependencies for htslib and Clara Genomics SDK
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -110,6 +137,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         make \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/lh3/minigraph/build
 
 RUN git clone --recursive -b ${MINIGRAPH_VERSION} --single-branch https://github.com/lh3/minigraph.git \
     && cd minigraph \
@@ -168,7 +197,7 @@ ENV LANG=C.UTF-8
 
 # Set environment variables
 ENV CUDA_HOME=/usr/local/cuda
-ENV PATH=/opt/nvidia/clara-genomics/bin:/opt/nvidia/clara-genomics/racon-gpu/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:${PATH}
+ENV PATH=/opt/nvidia/clara-genomics/bin:/opt/nvidia/clara-genomics/racon-gpu/bin:/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:${PATH}
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/lib:/opt/nvidia/clara-genomics/lib
 
 WORKDIR /workspace
@@ -183,6 +212,8 @@ COPY --from=cga /opt/nvidia/clara-genomics/build/racon-gpu/build/vendor/rampler/
 COPY --from=cga /opt/nvidia/clara-genomics/build/racon-gpu/test/data/ /opt/nvidia/clara-genomics/build/racon-gpu/test/data/
 # Copy htslib binaries
 COPY --from=cga /opt/nvidia/clara-genomics/build/htslib-1.9/install/ /usr/local/
+# Copy minmap2 binary
+COPY --from=minimap2 /opt/lh3/minimap2/build/minimap2 /opt/lh3/minimap2/bin/
 # Copy minigraph binary
 COPY --from=minigraph /opt/lh3/minigraph/build/minigraph /opt/lh3/minigraph/bin/
 # Copy seqwish binary
