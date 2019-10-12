@@ -98,3 +98,18 @@ we need to validate the quality of the graph generated compared to minimap2.
 
 In parallel we're building an applet for the minimap/cudamapper + seqwish flow to do de novo graph generation from long reads.
 
+
+```
+
+                                             _       _ _                         
+                                            (_)     (_) |                        
+  ___ _   _ _ __   ___ _ __ ______ _ __ ___  _ _ __  _| |_ _   _ _ __   ___ _ __ 
+ / __| | | | '_ \ / _ \ '__|______| '_ ` _ \| | '_ \| | __| | | | '_ \ / _ \ '__|
+ \__ \ |_| | |_) |  __/ |         | | | | | | | | | | | |_| |_| | |_) |  __/ |   
+ |___/\__,_| .__/ \___|_|         |_| |_| |_|_|_| |_|_|\__|\__, | .__/ \___|_|   
+           | |                                              __/ | |              
+           |_|                                             |___/|_|              
+
+
+```
+
