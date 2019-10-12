@@ -94,7 +94,7 @@ map those reads to the graph.
 
 ### Graph construction from reference genome + SV calls in *the cloud* [**70% Complete**]
 
-fast(a/q) &rarr; svaha2 &rarr; GFA
+VCF + fast(a/q) &rarr; :cloud: svaha2 :cloud: &rarr; GFA 
 
 
 We downloaded the [GIAB Tier 1 SV calls](ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/),
