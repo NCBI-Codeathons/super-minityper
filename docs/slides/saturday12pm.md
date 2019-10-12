@@ -110,6 +110,9 @@ This is sitting in our DNAnexus project but we'd love to share it publicly!
 
 We also pulled corresponding long-read data from GIAB, converted it to FASTQ, and we're preparing to run super-minityper on it.
 
+**Last todo:** testing. `svaha2` itself is under unit testing but we haven't tested the applet. Also,
+the output appears to be incompatible with minigraph.
+
 
 ### Graph construction from long reads [**<50% Complete**]
 
