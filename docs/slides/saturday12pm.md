@@ -24,8 +24,8 @@ New goals:
 1. Create a workflow for mapping (long) reads to SV graphs in DNAnexus  
 2. Add tooling for constructing graphs from SV calls.  
 3. Build parallel workflows for minimap2 -> seqwish graph induction:  
-  - vanilla minimap2 &rarr; PFA filtering &rarr; seqwish = GFA
-  - cudamapper &rarr; PFA filtering&rarr; seqwish = GFA. This requires modifying the output of
+  - vanilla minimap2 :arrow_right: PFA filtering :arrow_right: seqwish = GFA
+  - cudamapper :arrow_right: PFA filtering:arrow_right: seqwish = GFA. This requires modifying the output of
   cudamapper to output cigar strings.
 4. Do some basic viz/stats in GFA/GAF  
   - [PAF Viz](https://github.com/dwinter/pafr) (GAF is a superset of PAF)  
@@ -80,7 +80,7 @@ useful if no reference genome is available.
 
 ### Read-to-graph alignment [**DONE**]
 
-fast(a/q) + GFA &rarr; minigraph &rarr; GAF (graph alignments)
+fast(a/q) + GFA :arrow_right: minigraph :arrow_right: GAF (graph alignments)
 
 We integrated a new DNAnexus workflow for graph alignment (you're welcome, [@officialbenbusby](https://twitter.com/dcgenomics?lang=en)):
 
@@ -94,7 +94,7 @@ map those reads to the graph.
 
 ### Graph construction from reference genome + SV calls in *the cloud* [**70% Complete**]
 
-VCF + fast(a/q) &rarr; :cloud: svaha2 :cloud: &rarr; GFA 
+VCF + fast(a/q) :arrow_right: :cloud: svaha2 :cloud: :arrow_right: GFA 
 
 
 We downloaded the [GIAB Tier 1 SV calls](ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/),
@@ -107,7 +107,7 @@ We also pulled corresponding long-read data from GIAB, converted it to FASTQ, an
 
 ### Graph construction from long reads [**<50% Complete**]
 
-fast(a/q) &rarr; minimap2/cudamapper (PAF) &rarr; seqwish &rarr; graph (GFA)  
+fast(a/q) :arrow_right: minimap2/cudamapper (PAF) :arrow_right: seqwish :arrow_right: graph (GFA)  
 
 We benchmarked minimap2 performance for generating all-2-all mapping with alignment cigar strings (i.e. input to seqwish).
 On a core i9 12 core machine, that takes about 15 mins for E Coli read set from ONT.
