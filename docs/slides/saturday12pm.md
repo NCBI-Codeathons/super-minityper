@@ -57,8 +57,7 @@ and position of the soft-clipped portion.
 Graphs can encode SVs explicitly and align directly to them:
 ```
 Linear Ref         : -----------------------------------------------------------
-Read               :    +++++++
-Graph mapped SC bit:                                               +++ 
+Read               :    +++++++                                    +++
 Path in graph      :           ------------------------------------
 ```
 
