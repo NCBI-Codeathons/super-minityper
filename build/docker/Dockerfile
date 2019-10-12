@@ -117,6 +117,46 @@ RUN git clone --recursive -b ${MINIGRAPH_VERSION} --single-branch https://github
 
 
 ###############################################################################
+# Seqwish
+###############################################################################
+# reused author's Dockerfile from https://github.com/ekg/seqwish/blob/master/Dockerfile
+
+# load base image
+FROM ${LINUX_DISTRO}:${LINUX_DISTRO_VERSION} AS seqwish
+
+# update system
+RUN apt-get update > /dev/null
+
+# install dependencies
+RUN apt-get -qqy install zlib1g zlib1g-dev libomp-dev
+
+# install build tools
+RUN apt-get -qqy install build-essential software-properties-common && \
+    add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
+    apt-get update > /dev/null && \
+    apt-get -qqy install gcc-snapshot && \
+    apt-get update > /dev/null && \
+    apt-get -qqy install gcc-8 g++-8 && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8 && \
+    apt-get -qqy install cmake git
+
+# copy over current directory to container
+ADD . /seqwish
+
+# set working directory
+WORKDIR /seqwish
+
+# build
+RUN cmake -H. -Bbuild && cmake --build build -- -j3
+
+# cleanup
+RUN apt-get -qy autoremove
+
+# add seqwish to the PATH
+ENV PATH /seqwish/bin:$PATH
+
+
+###############################################################################
 # Super Minityper
 ###############################################################################
 FROM ${FROM_IMAGE}:${CUDA_VERSION}-base-${LINUX_VERSION} AS super-minityper
@@ -128,7 +168,7 @@ ENV LANG=C.UTF-8
 
 # Set environment variables
 ENV CUDA_HOME=/usr/local/cuda
-ENV PATH=/opt/nvidia/clara-genomics/bin:/opt/nvidia/clara-genomics/racon-gpu/bin:/opt/lh3/minigraph/bin:${PATH}
+ENV PATH=/opt/nvidia/clara-genomics/bin:/opt/nvidia/clara-genomics/racon-gpu/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:${PATH}
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/lib:/opt/nvidia/clara-genomics/lib
 
 WORKDIR /workspace
@@ -145,6 +185,8 @@ COPY --from=cga /opt/nvidia/clara-genomics/build/racon-gpu/test/data/ /opt/nvidi
 COPY --from=cga /opt/nvidia/clara-genomics/build/htslib-1.9/install/ /usr/local/
 # Copy minigraph binary
 COPY --from=minigraph /opt/lh3/minigraph/build/minigraph /opt/lh3/minigraph/bin/
+# Copy seqwish binary
+COPY --from=seqwish /seqwish/bin/seqwish /opt/ekg/seqwish/bin/
 
 # Correct binary locations for racon_wrapper
 RUN sed -i -e 's#/opt/nvidia/clara-genomics/build/racon-gpu/build/bin/racon#/opt/nvidia/clara-genomics/racon-gpu/bin/racon#' \
