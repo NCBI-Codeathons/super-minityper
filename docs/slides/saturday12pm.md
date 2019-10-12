@@ -93,6 +93,11 @@ map those reads to the graph.
 
 ![DXSMTRUN](https://raw.githubusercontent.com/NCBI-Codeathons/super-minityper/edawson/docs/images/dnanexus_smt.png)
 
+**But it's buggy!**, so we're fixing those (thanks, GFA1...).
+
+**Eventual product**: graph mappings. you get **~automated phasing~** if you iterate over the GAF
+and generate a mapping from node -> count of matching reads (O(n) phasing, hooray!).
+
 ### Fast graph construction from a reference genome + SV calls :fire::zap::cloud: [**90% Complete**]
 
 VCF + fast(a/q) :arrow_right: :cloud: svaha2 :cloud: :arrow_right: GFA 
