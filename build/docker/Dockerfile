@@ -174,9 +174,6 @@ RUN apt-get -qqy install build-essential software-properties-common && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80 --slave /usr/bin/g++ g++ /usr/bin/g++-8 && \
     apt-get -qqy install cmake git
 
-# copy over current directory to container
-# ADD . /seqwish
-
 # set working directory
 WORKDIR /opt/ekg/seqwish/build
 
@@ -192,22 +189,91 @@ RUN apt-get -qy autoremove
 # add seqwish to the PATH
 ENV PATH /opt/ekg/seqwish/build/bin:$PATH
 
-###############################################################################
-# Binaries Only
-###############################################################################
-FROM ubuntu:16.04 AS binaries
 
-# Copy htslib binaries
-COPY --from=cga /opt/nvidia/clara-genomics/build/htslib/install/ /usr/local/
+###############################################################################
+# Svaha2 : https://github.com/edawson/svaha2
+###############################################################################
+FROM ${LINUX_DISTRO}:${LINUX_DISTRO_VERSION} AS svaha2
+
+# master commit ID is fea13b9 on 10/12/2019
+ARG SVAHA2_VERSION=fea13b9
+ENV SVAHA2_VERSION=${SVAHA2_VERSION}
+
+# Ensure apt-get won't prompt for selecting options
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+# Install dependencies for htslib and Clara Genomics SDK
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        git \
+        build-essential \
+        make \
+        autoconf \
+        automake \
+        make \
+        perl \
+		tabix \
+        zlib1g-dev \
+        libbz2-dev \
+        liblzma-dev \
+        libcurl4-gnutls-dev \
+        libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/edawson/svaha2/build
+
+RUN git clone --recursive -b master --single-branch https://github.com/edawson/svaha2.git \
+    && cd svaha2 \
+	&& git reset --hard ${SVAHA2_VERSION} \
+    && make
+
+
+###############################################################################
+# dxWDL builder
+###############################################################################
+FROM openjdk:8u222 AS dx-wdl-builder
+
+ARG DXWDL_VERSION=1.00
+ENV DXWDL_VERSION=${DXWDL_VERSION}
+
+WORKDIR /workspace
+
+RUN wget https://dnanexus-sdk.s3.amazonaws.com/dx-toolkit-v0.288.0-ubuntu-16.04-amd64.tar.gz \
+	&& tar -xzf dx-toolkit*.tar.gz \
+	&& wget https://github.com/dnanexus/dxWDL/releases/download/$DXWDL_VERSION/dxWDL-$DXWDL_VERSION.jar \
+    && chmod +x dxWDL-$DXWDL_VERSION.jar \
+	&& mv dxWDL-$DXWDL_VERSION.jar dxWDL.jar
+
+
+###############################################################################
+# Super Minityper CPU
+###############################################################################
+FROM ${LINUX_DISTRO}:${LINUX_DISTRO_VERSION} AS super-minityper-cpu
+
+# Ensure apt-get won't prompt for selecting options
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
 # Copy minmap2 binary
 COPY --from=minimap2 /opt/lh3/minimap2/build/minimap2 /opt/lh3/minimap2/bin/
 # Copy minigraph binary
 COPY --from=minigraph /opt/lh3/minigraph/build/minigraph /opt/lh3/minigraph/bin/
 # Copy seqwish binary
 COPY --from=seqwish /opt/ekg/seqwish/build/seqwish/bin/seqwish /opt/ekg/seqwish/bin/
+# Copy svaha2 binary
+COPY --from=svaha2 /opt/edawson/svaha2/build/svaha2 /opt/edawson/svaha2/bin/
 
-ENV PATH=/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:${PATH}
+ENV PATH=/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:/opt/edawson/svaha2/bin:${PATH}
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		zlib1g \
+		libgomp1 \
+		libatomic1 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
 
@@ -224,7 +290,7 @@ ENV LANG=C.UTF-8
 
 # Set environment variables
 ENV CUDA_HOME=/usr/local/cuda
-ENV PATH=/opt/nvidia/clara-genomics/bin:/opt/nvidia/clara-genomics/racon-gpu/bin:/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:${PATH}
+ENV PATH=/opt/nvidia/clara-genomics/bin:/opt/nvidia/clara-genomics/racon-gpu/bin:/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:/opt/edawson/svaha2/bin:${PATH}
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/lib:/opt/nvidia/clara-genomics/lib
 
 WORKDIR /workspace
@@ -245,6 +311,8 @@ COPY --from=minimap2 /opt/lh3/minimap2/build/minimap2 /opt/lh3/minimap2/bin/
 COPY --from=minigraph /opt/lh3/minigraph/build/minigraph /opt/lh3/minigraph/bin/
 # Copy seqwish binary
 COPY --from=seqwish /opt/ekg/seqwish/build/seqwish/bin/seqwish /opt/ekg/seqwish/bin/
+# Copy svaha2 binary
+COPY --from=svaha2 /opt/edawson/svaha2/build/svaha2 /opt/edawson/svaha2/bin/
 
 # Correct binary locations for racon_wrapper
 RUN sed -i -e 's#/opt/nvidia/clara-genomics/build/racon-gpu/build/bin/racon#/opt/nvidia/clara-genomics/racon-gpu/bin/racon#' \
