@@ -2,6 +2,13 @@ task minigraph{
   File inputFASTQ
   File inputGFA
 
+  String preset = "lr"
+
+  Int kmerSize = 15
+  Int windowSize = 10
+  Int threads = 8
+  Int diskGB
+
   String outbase = basename(inputGFA, "GFA") + basename(inputFASTQ)
 
   command{
@@ -10,8 +17,9 @@ task minigraph{
   
   runtime{
     docker: "erictdawson/minigraph"
-    cpu : 12
+    cpu : "${threads}"
     memory : "16 GB"
+    disk : "local-disk " + diskGB + " HDD"
   }
 
   output{
