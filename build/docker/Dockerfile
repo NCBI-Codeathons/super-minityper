@@ -92,6 +92,9 @@ RUN git clone --recursive -b ${RACON_GPU_VERSION} --single-branch https://github
 ###############################################################################
 FROM ${LINUX_DISTRO}:${LINUX_DISTRO_VERSION} AS minigraph
 
+ARG MINIGRAPH_VERSION=v0.5
+ENV MINIGRAPH_VERSION=${MINIGRAPH_VERSION}
+
 # Ensure apt-get won't prompt for selecting options
 ENV DEBIAN_FRONTEND=noninteractive
 ENV LC_ALL=C.UTF-8
@@ -108,7 +111,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone --recursive https://github.com/lh3/minigraph.git \
+RUN git clone --recursive -b ${MINIGRAPH_VERSION} --single-branch https://github.com/lh3/minigraph.git \
     && cd minigraph \
     && make
 
