@@ -17,10 +17,21 @@ New goals:
 
 ## Workflow progress
 
-We integrated a new DNAnexus workflow for graph alignment (you're welcome, @benbusby):
+### Read-to-graph alignment [**DONE**]
+We integrated a new DNAnexus workflow for graph alignment (you're welcome, [@officialbenbusby](https://twitter.com/dcgenomics?lang=en)):
 
 fast(a/q) + GFA &rarr; minigraph &rarr; GAF (graph alignments)
 
 The WDL for this is in out [WDL directory](https://github.com/NCBI-Codeathons/super-minityper/tree/master/wdl).
 
 We also compiled it to DNAnexus using dxWDL. The tool is called SuperMiniTyper.
+
+### Graph construction from reference genome + SV calls [**70% Complete**]
+We downloaded the [GIAB Tier 1 SV calls](ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/),
+did some data munging,
+and constructed a graph using [svaha2](https://github.com/edawson/svaha2) (after crushing some svaha2 bugs, *yikes*).
+This is sitting in our DNAnexus project but we'd love to share it publicly!
+
+We also pulled corresponding long-read data from GIAB, converted it to FASTQ, and we're preparing to run super-minityper on it.
+
+### Graph construction from long reads [**<50% Complete**]
