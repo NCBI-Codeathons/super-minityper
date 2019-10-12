@@ -13,7 +13,7 @@ New goals:
   - cudamapper &rarr; PFA filtering&rarr; seqwish = GFA. This requires modifying the output of
   cudamapper to output cigar strings.
 
-\pagebreak
+<div style="page-break-after: always;"></div>
 
 ## Workflow progress
 
