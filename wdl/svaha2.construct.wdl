@@ -13,7 +13,7 @@ task construct{
   runtime{
      docker: "erictdawson/svaha2"
      cpu : 1
-     memory : "20 GB"
+     memory : "24 GB"
      preemptible : 2
      disks : "local-disk " + diskGB + " SSD"
   }
@@ -23,7 +23,7 @@ task construct{
   }
 }
 
-workflow Svaha2Construct{
+workflow Svaha2ConstructGraph{
   File inputFA
   File inputVCF
   Int maxNodeLength = 32
