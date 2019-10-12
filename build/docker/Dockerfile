@@ -63,8 +63,9 @@ WORKDIR /opt/nvidia/clara-genomics/build
 
 # Install htslib
 RUN wget https://github.com/samtools/htslib/releases/download/${HTSLIB_VERSION}/htslib-${HTSLIB_VERSION}.tar.bz2 \
-    && tar xvf htslib-${HTSLIB_VERSION}.tar.bz2 \
-    && cd htslib-${HTSLIB_VERSION} \
+    && mkdir htslib \
+	&& tar xvf htslib-${HTSLIB_VERSION}.tar.bz2 -C htslib --strip-components=1 \
+    && cd htslib \
     && ./configure \
     && make -j16 prefix=install install \
     && rsync -avz install/* /usr/local/
@@ -153,6 +154,10 @@ RUN git clone --recursive -b ${MINIGRAPH_VERSION} --single-branch https://github
 # load base image
 FROM ${LINUX_DISTRO}:${LINUX_DISTRO_VERSION} AS seqwish
 
+# master commit ID is 3e94aa8 on 10/12/2019
+ARG SEQWISH_VERSION=3e94aa8
+ENV SEQWISH_VERSION=${SEQWISH_VERSION}
+
 # update system
 RUN apt-get update > /dev/null
 
@@ -170,19 +175,41 @@ RUN apt-get -qqy install build-essential software-properties-common && \
     apt-get -qqy install cmake git
 
 # copy over current directory to container
-ADD . /seqwish
+# ADD . /seqwish
 
 # set working directory
-WORKDIR /seqwish
+WORKDIR /opt/ekg/seqwish/build
 
-# build
-RUN cmake -H. -Bbuild && cmake --build build -- -j3
+# clone repository and build
+RUN git clone --recursive -b master --single-branch https://github.com/ekg/seqwish.git \
+	&& cd seqwish \
+	&& git reset --hard ${SEQWISH_VERSION} \
+	&& cmake -H. -Bbuild && cmake --build build -- -j3
 
 # cleanup
 RUN apt-get -qy autoremove
 
 # add seqwish to the PATH
-ENV PATH /seqwish/bin:$PATH
+ENV PATH /opt/ekg/seqwish/build/bin:$PATH
+
+###############################################################################
+# Binaries Only
+###############################################################################
+FROM ubuntu:16.04 AS binaries
+
+# Copy htslib binaries
+COPY --from=cga /opt/nvidia/clara-genomics/build/htslib/install/ /usr/local/
+# Copy minmap2 binary
+COPY --from=minimap2 /opt/lh3/minimap2/build/minimap2 /opt/lh3/minimap2/bin/
+# Copy minigraph binary
+COPY --from=minigraph /opt/lh3/minigraph/build/minigraph /opt/lh3/minigraph/bin/
+# Copy seqwish binary
+COPY --from=seqwish /opt/ekg/seqwish/build/seqwish/bin/seqwish /opt/ekg/seqwish/bin/
+
+ENV PATH=/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:${PATH}
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+
+WORKDIR /workspace
 
 
 ###############################################################################
@@ -211,13 +238,13 @@ COPY --from=cga /opt/nvidia/clara-genomics/build/racon-gpu/build/bin/ /opt/nvidi
 COPY --from=cga /opt/nvidia/clara-genomics/build/racon-gpu/build/vendor/rampler/bin/ /opt/nvidia/clara-genomics/racon-gpu/bin/
 COPY --from=cga /opt/nvidia/clara-genomics/build/racon-gpu/test/data/ /opt/nvidia/clara-genomics/build/racon-gpu/test/data/
 # Copy htslib binaries
-COPY --from=cga /opt/nvidia/clara-genomics/build/htslib-1.9/install/ /usr/local/
+COPY --from=cga /opt/nvidia/clara-genomics/build/htslib/install/ /usr/local/
 # Copy minmap2 binary
 COPY --from=minimap2 /opt/lh3/minimap2/build/minimap2 /opt/lh3/minimap2/bin/
 # Copy minigraph binary
 COPY --from=minigraph /opt/lh3/minigraph/build/minigraph /opt/lh3/minigraph/bin/
 # Copy seqwish binary
-COPY --from=seqwish /seqwish/bin/seqwish /opt/ekg/seqwish/bin/
+COPY --from=seqwish /opt/ekg/seqwish/build/seqwish/bin/seqwish /opt/ekg/seqwish/bin/
 
 # Correct binary locations for racon_wrapper
 RUN sed -i -e 's#/opt/nvidia/clara-genomics/build/racon-gpu/build/bin/racon#/opt/nvidia/clara-genomics/racon-gpu/bin/racon#' \
