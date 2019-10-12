@@ -57,8 +57,8 @@ and position of the soft-clipped portion.
 Graphs can encode SVs explicitly and align directly to them:
 ```
 Linear Ref         : -----------------------------------------------------------
+Alt path in graph  :           ------------------------------------
 Read               :    +++++++                                    +++
-Path in graph      :           ------------------------------------
 ```
 
 Because a path exists in the graph, the read can be mapped exactly to the variant path.
