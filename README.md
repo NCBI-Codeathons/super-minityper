@@ -1,4 +1,4 @@
-# Fast SV graph analysis on GPUs / in The Cloud
+# Fast SV graph analysis on GPUs :fire: / in The Cloud :cloud:
 
 ```
                                                    _         _  _                             
