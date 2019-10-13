@@ -1,0 +1,34 @@
+digraph{
+label = "super-minityper"
+rankdir=LR;
+
+refFA[shape="box", label="Reference (FASTA)"];
+svahaVCF[shape="box", label="SV calls (VCF)"];
+svahaGFA[shape="box", label="SV graph (GFA)"];
+seqwishGFA[shape="box", label="Seqwish Graph (GFA)"];
+readsFA[shape="box", label="Reads (FASTA/FASTQ)"];
+
+svaha[shape="parallelogram", style="rounded", label="svaha2"];
+minigraph[shape="parallelogram", style="rounded", label="minigraph"];
+seqwish[shape="parallelogram", style="rounded", label="seqwish"];
+minimap2[shape="parallelogram", style="rounded", label="minimap2"];
+fpa[shape="parallelogram", style="rounded", label="fpa (filter overlaps)"];
+cudamapper[shape="parallelogram", style="rounded", label="cudamapper"];
+
+outputGAF[shape="diamond", label="Graph Mappings (GAF)"];
+
+refFA -> svaha;
+svahaVCF -> svaha;
+svaha -> svahaGFA;
+
+readsFA -> minigraph;
+svahaGFA -> minigraph;
+minigraph -> outputGAF;
+
+cudamapper -> fpa;
+minimap2 -> fpa;
+fpa -> seqwish;
+seqwish -> seqwishGFA;
+seqwishGFA -> minigraph;
+
+}

@@ -1,0 +1,18 @@
+digraph{
+label = "minigraph"
+rankdir=LR;
+
+svahaGFA[shape="box", label="SV graph (GFA)"];
+readsFA[shape="box", label="Reads (FASTA/FASTQ)"];
+
+minigraph[shape="parallelogram", style="rounded", label="minigraph"];
+
+outputGAF[shape="diamond", label="Graph Mappings (GAF)"];
+
+
+readsFA -> minigraph;
+svahaGFA -> minigraph;
+minigraph -> outputGAF;
+
+
+}
