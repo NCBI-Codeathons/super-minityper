@@ -2,13 +2,14 @@ task seqwish{
     File inputFA
     File inputPAF
     Int diskGB
-  
+    Int threads = 8
+
   String outbase = basename(basename(inputFA, "fa"), ".gz")
-  
+
   command{
-     seqwish -s ${inputFA} -p ${inputPAF} -b ${outbase}.graph -g ${outbase}.gfa
+     seqwish -s ${inputFA} -p ${inputPAF} -b ${outbase}.graph -g ${outbase}.gfa -t ${threads}
   }
-  
+
   runtime{
      docker: "erictdawson/svaha2"
      cpu : 1
@@ -70,5 +71,5 @@ workflow Svaha2ConstructGraph{
     input:
       inputFA=inputFA,
       diskGB=diskGB
-  }	
+  }
 }

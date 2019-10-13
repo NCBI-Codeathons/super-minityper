@@ -7,7 +7,7 @@ task SuperMiniTyper_seqwish {
   String outbase = basename(inputFASTQ)
 
   command{
-    seqwish -s ${inputFASTQ} -p ${inputPAF} -b ${outbase}.graph -g ${outbase}.gfa
+    seqwish -s ${inputFASTQ} -p ${inputPAF} -b ${outbase}.graph -g ${outbase}.gfa -t ${threads}
   }
 
   runtime {
