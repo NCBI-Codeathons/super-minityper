@@ -1,5 +1,13 @@
 import sys
 
+if (len(sys.argv) < 2):
+    # Print help
+    print("Usage:")
+    print("gaf.py <input.gaf> <buckets>")
+    print("input.gaf - Path to GAF file")
+    print("buckets - Number of bins for bucketing start position of alignments in path")
+    exit(0)
+
 inputFile = sys.argv[1]
 buckets = int(sys.argv[2])
 
