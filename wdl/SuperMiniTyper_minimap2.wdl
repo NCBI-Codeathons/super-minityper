@@ -6,7 +6,7 @@ task SuperMiniTyper_minimap2 {
   String outbase = basename(inputFASTQ)
 
   command {
-    minimap2 ${inputFASTQ} ${inputFASTQ} -c -X > ${outbase}.paf
+    minimap2 ${inputFASTQ} ${inputFASTQ} -t ${threads} -c -X > ${outbase}.paf
   }
 
   runtime {
