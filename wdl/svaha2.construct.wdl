@@ -14,6 +14,7 @@ task construct{
      docker: "erictdawson/svaha2"
      cpu : 1
      memory : "24 GB"
+     dx_instance_type: "mem3_ssd1_x4"
      preemptible : 2
      disks : "local-disk " + diskGB + " SSD"
   }
