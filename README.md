@@ -1,23 +1,53 @@
-# Graphs on GPUs
+# Fast SV graph analysis on GPUs :fire: / in The Cloud :cloud:
 
-TODO: motivation and overall description
+```
+                                                   _         _  _                             
+                                                  (_)       (_)| |                            
+ ___  _   _  _ __    ___  _ __  ______  _ __ ___   _  _ __   _ | |_  _   _  _ __    ___  _ __ 
+/ __|| | | || '_ \  / _ \| '__||______|| '_ ` _ \ | || '_ \ | || __|| | | || '_ \  / _ \| '__|
+\__ \| |_| || |_) ||  __/| |           | | | | | || || | | || || |_ | |_| || |_) ||  __/| |   
+|___/ \__,_|| .__/  \___||_|           |_| |_| |_||_||_| |_||_| \__| \__, || .__/  \___||_|   
+            | |                                                       __/ || |                
+            |_|                                                      |___/ |_|                
+```
+
+
+`super-minityper` is a set of cloud-based workflows for constructing SV graphs and mapping reads to them.
+
+Structural variants frustrate read mapping because aligners
+often choose not to map read portions which map very distantly.
+Graphs allow incorporating known variants, including large ones,
+and then mapping directly to these. While this has been shown to reduce reference bias and improve
+read mappings when a sample contains variants in the graph,
+constructing graph genomes and operating on them
+has historically been difficult and time-consuming.
+
+We present a set of cloud-based workflows &mdash; composed mostly of preexisting and optimized tools &mdash; to
+construct graphs containing structural variants and map reads to them. These workflows allow users to take
+arbitrary SV calls, construct a graph, and map reads to these graphs. This workflow prioritizes ease-of-use and
+speed, ingesting common input formats and returning results in minutes on commodity cloud VMs.
 
 ## Implementation
+`super-minityper` is implemented as a DNAnexus cloud applet. There are analgous WDL files for performing all analyses as well.
 
-TODO: describe implementation
+The general workflow(s) are outlined in the below figure:
+![](docs/images/overview.png)
+
+A graph can be constructed from either a FASTA reference genome and structural variant calls (in the VCF format) or
+a set of long reads, which are aligned and assembled using read-read pairwise alignment and the [seqwish variation graph inducer](https://github.com/ekg/seqwish).
 
 ## Docker images:
 
 ### ncbicodeathons/superminityper:0.1-cpu
 
 The image includes the following tools:
-- [minmap2](https://github.com/lh3/minimap2)
+- [minimap2](https://github.com/lh3/minimap2)
 - [minigraph](https://github.com/lh3/minigraph)
 - [seqwish](https://github.com/ekg/seqwish)
 - [svaha2](https://github.com/edawson/svaha2)
 - [fpa](https://github.com/natir/fpa)
 
-Dockerfile is avaialable at [here](https://github.com/NCBI-Codeathons/super-minityper/blob/master/build/docker/Dockerfile)
+Dockerfile is available at [here](https://github.com/NCBI-Codeathons/super-minityper/blob/master/build/docker/Dockerfile)
 
 **Build from source code**
 
@@ -59,7 +89,7 @@ help(fastaio.write_fasta)
 #       None.
 ```
 
-Dockerfile is avaialable at [here](https://github.com/NCBI-Codeathons/super-minityper/blob/master/build/docker/Dockerfile)
+Dockerfile is available at [here](https://github.com/NCBI-Codeathons/super-minityper/blob/master/build/docker/Dockerfile)
 
 **Build from source code**
 
@@ -114,20 +144,42 @@ Dockerfile for `erictdawson/base`: https://github.com/edawson/dawdl/blob/master/
 minigraph (dockerhub): `erictdawson/minigraph`
 
 ## svaha2: build graphs for SVs in GFA (from FASTA and VCF)
+[svaha2](https://github.com/edawson/svaha2) is a C++ tool for quickly generating simple
+structural variation graphs from a reference genome and a set of variants a VCF file.
+It does this using a construction algorithm that is designed to operate in time linear to the
+number of breakpoints. It also prioritizes efficient use of RAM.
 
-TODO: description of tool
+![](docs/images/svaha2.png)
+
 
 source code: https://github.com/edawson/svaha2
-Docs are in README and in Eric Dawson's brain.
 
-TODO: Download Eric Dawson's brain
+The full algorithm is described in the svaha2 repository, but the main innovation is that
+pre-calculating the breakpoints (and sorting them) allows one to
+generate a graph with a coordinated ID space without requiring caching any of the graph in memory.
 
-Output should be GFA1. Easily converted to GFA2 with https://github.com/edawson/gfakluge
+The output of svaha2 is a graph described in GFA v1.0.
+
+
+## minigraph: align reads to GFA graphs
+[minigraph](https://github.com/lh3/minigraph) provides an experimental
+read-to-graph mapper. We map reads to the GFA v1.0 graph output by svaha2.
+This enables fast, push-button read-to-variants alignment with just
+a FASTA reference, a VCF containing SVs, and a FASTA/Q readset.
+
+source code: https://github.com/lh3/minigraph
+
+GAF (output) format: https://github.com/lh3/gfatools/blob/master/doc/rGFA.md#the-graph-alignment-format-gaf
+
+
 
 ## minimap2 + seqwish: build de novo graphs
 
 We use the minimap2 + seqwish flow to generate de novo graphs in the GFA1 format. This serves
 as the basis for aligning new reads to a reference graph.
+
+![](docs/images/seqwish.png)
+
 
 Source code:
 
@@ -152,7 +204,7 @@ The filtered PAF, along with the reads, is then passed into `seqwish` to generat
 
 The WDL files for this pipeline are in [minimap2 WDL](wdl/SuperMiniTyper_minimap2.wdl) and [seqwish WDL](wdl/SuperMiniTyper_seqwish.wdl).
 
-### Future Direction
+### Future Directions
 A GPU accelerated implementation of minimap2 is under development in the Clara Genomics Analysis SDK.
 
 source: https://github.com/clara-genomics/ClaraGenomicsAnalysis
@@ -162,14 +214,6 @@ for faster overlap generation.
 
 An experimental WDL file for using `cudamapper` has been made avaialble in [cudamapper WDL](wdl/SuperMiniTyper_cudamapper.wdl).
 
-## minigraph: map reads to graph
-
-TODO: description of tool
-
-source code: https://github.com/lh3/minigraph
-
-GAF (output) format: https://github.com/lh3/gfatools/blob/master/doc/rGFA.md#the-graph-alignment-format-gaf
-
 ## GAF analysis
 Once we have the GAF output (alignments of reads to a graph), we do some basic analysis of the contents of the GAF
 file using scripts under the `analysis` folder.
@@ -178,9 +222,5 @@ We are starting with simple counts such as number of alignments, and a breakdown
 to the graph in each alignment.
 
 The `gaf.py` script can be extended to understand the GAF structure in more depth.
-
-## Workflow
-
-![](docs/images/workflow.png)
 
 
