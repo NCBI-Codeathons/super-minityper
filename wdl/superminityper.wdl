@@ -1,7 +1,7 @@
 task minigraph{
   File inputFASTQ
   File inputGFA
-  Int diskGB
+  Int diskGB = 32
 
   String preset = "lr"
 

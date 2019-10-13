@@ -1,7 +1,7 @@
 task construct{
   File inputFA
   File inputVCF
-  Int diskGB
+  Int diskGB = 32
   Int maxNodeLength = 64
 
   String outbase = basename(inputFA, "fa") + "." + basename(inputVCF, ".vcf")

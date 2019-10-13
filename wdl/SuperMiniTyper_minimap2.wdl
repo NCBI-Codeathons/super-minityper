@@ -1,12 +1,12 @@
 task SuperMiniTyper_minimap2 {
   File inputFASTQ
-  Int diskGB
+  Int diskGB = 32
   Int threads = 8
 
   String outbase = basename(inputFASTQ)
 
   command {
-    minimap2 ${inputFASTQ} ${inputFASTQ} -t ${threads} -c -X > ${outbase}.paf
+    minimap2 -x ava-pb ${inputFASTQ} ${inputFASTQ} -t ${threads} -c -X > ${outbase}.paf
   }
 
   runtime {

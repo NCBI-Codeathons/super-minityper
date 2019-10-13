@@ -1,6 +1,6 @@
 task SuperMiniTyper_cudamapper {
   File inputFASTQ
-  Int diskGB
+  Int diskGB = 32
   Int threads = 8
 
   Int kmerSize = 15

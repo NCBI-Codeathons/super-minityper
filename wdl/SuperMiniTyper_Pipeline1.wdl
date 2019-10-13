@@ -1,13 +1,13 @@
 task Pipeline1_minimap2 {
   File inputFASTQ
   Int dropLengthLower = 10000
-  Int diskGB
+  Int diskGB = 32
   Int threads = 8
 
   String outbase = basename(inputFASTQ)
 
   command {
-    minimap2 ${inputFASTQ} ${inputFASTQ} -t ${threads} -c -X | fpa drop -l ${dropLengthLower} > ${outbase}.paf
+    minimap2 -x ava-pb ${inputFASTQ} ${inputFASTQ} -t ${threads} -c -X | fpa drop -l ${dropLengthLower} > ${outbase}.paf
   }
 
   runtime {
@@ -28,7 +28,7 @@ task Pipeline1_minimap2 {
 task Pipeline1_seqwish {
   File inputFASTQ
   File inputPAF
-  Int diskGB
+  Int diskGB = 32
   Int threads = 8
 
   String outbase = basename(inputFASTQ)
@@ -55,7 +55,7 @@ task Pipeline1_seqwish {
 
 workflow SuperMiniTyper_Pipeline1 {
   File inputFASTQ
-  Int diskGB
+  Int diskGB = 32
   Int threads = 8
 
   call Pipeline1_minimap2 {

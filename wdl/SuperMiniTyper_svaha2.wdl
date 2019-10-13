@@ -1,7 +1,7 @@
 task SuperMiniTyper_svaha2 {
   File inputFA
   File inputVCF
-  Int diskGB
+  Int diskGB = 32
   Int maxNodeLength = 32
 
   String outbase = basename(inputFA, "fa") + "." + basename(inputVCF, ".vcf")

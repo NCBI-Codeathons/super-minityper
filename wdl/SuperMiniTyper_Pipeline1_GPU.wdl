@@ -1,6 +1,6 @@
 task Pipeline1_GPU_cudamapper {
   File inputFASTQ
-  Int diskGB
+  Int diskGB = 32
   Int threads = 8
 
   Int kmerSize = 15
@@ -34,7 +34,7 @@ task Pipeline1_GPU_cudamapper {
 task Pipeline1_GPU_seqwish {
   File inputFASTQ
   File inputPAF
-  Int diskGB
+  Int diskGB = 32
   Int threads = 8
 
   String outbase = basename(inputFASTQ)
@@ -61,7 +61,7 @@ task Pipeline1_GPU_seqwish {
 
 workflow SuperMiniTyper_Pipeline1_GPU {
   File inputFASTQ
-  Int diskGB
+  Int diskGB = 32
   Int threads = 8
 
   call Pipeline1_GPU_cudamapper {
