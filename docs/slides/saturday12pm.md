@@ -77,7 +77,7 @@ useful if no reference genome is available.
 
 ## Workflow progress
 
-### Read-to-graph alignment [**DONE**]
+### Read-to-graph alignment [**90% Complete**]
 
 fast(a/q) + GFA :arrow_right: minigraph :arrow_right: GAF (graph alignments)
 
@@ -93,7 +93,12 @@ map those reads to the graph.
 
 ![DXSMTRUN](https://raw.githubusercontent.com/NCBI-Codeathons/super-minityper/edawson/docs/images/dnanexus_smt.png)
 
-### Fast graph construction from a reference genome + SV calls :fire::zap::cloud: [**DONE**]
+**But it's buggy!**, so we're fixing those (thanks, GFA1...).
+
+**Eventual product**: graph mappings. you get **automated phasing** if you iterate over the GAF
+and generate a mapping from node -> count of matching reads (O(n) phasing, hooray!).
+
+### Fast graph construction from a reference genome + SV calls :fire::zap::cloud: [**90% Complete**]
 
 VCF + fast(a/q) :arrow_right: :cloud: svaha2 :cloud: :arrow_right: GFA 
 
@@ -104,6 +109,9 @@ and constructed a graph using [svaha2](https://github.com/edawson/svaha2) (after
 This is sitting in our DNAnexus project but we'd love to share it publicly!
 
 We also pulled corresponding long-read data from GIAB, converted it to FASTQ, and we're preparing to run super-minityper on it.
+
+**Last todo:** testing. `svaha2` itself is under unit testing but we haven't tested the applet. Also,
+the output appears to be incompatible with minigraph.
 
 
 ### Graph construction from long reads [**<50% Complete**]
