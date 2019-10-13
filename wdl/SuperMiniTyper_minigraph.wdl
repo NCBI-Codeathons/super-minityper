@@ -1,7 +1,7 @@
 task SuperMiniTyper_minigraph {
   File inputFASTQ
   File inputGFA
-  Int diskGB
+  Int diskGB = 32
 
   String preset = "lr"
   Int kmerSize = 15

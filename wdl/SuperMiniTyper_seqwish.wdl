@@ -1,7 +1,7 @@
 task SuperMiniTyper_seqwish {
   File inputFASTQ
   File inputPAF
-  Int diskGB
+  Int diskGB = 32
   Int threads = 8
 
   String outbase = basename(inputFASTQ)
