@@ -1,23 +1,51 @@
-# Graphs on GPUs
+# Fast SV graph analysis on GPUs / in The Cloud
 
-TODO: motivation and overall description
+```
+                                                   _         _  _                             
+                                                  (_)       (_)| |                            
+ ___  _   _  _ __    ___  _ __  ______  _ __ ___   _  _ __   _ | |_  _   _  _ __    ___  _ __ 
+/ __|| | | || '_ \  / _ \| '__||______|| '_ ` _ \ | || '_ \ | || __|| | | || '_ \  / _ \| '__|
+\__ \| |_| || |_) ||  __/| |           | | | | | || || | | || || |_ | |_| || |_) ||  __/| |   
+|___/ \__,_|| .__/  \___||_|           |_| |_| |_||_||_| |_||_| \__| \__, || .__/  \___||_|   
+            | |                                                       __/ || |                
+            |_|                                                      |___/ |_|                
+```
+
+
+`super-minityper` is a set of cloud-based workflows for constructing SV graphs and mapping reads to them.
+
+Structural variants frustrate linear mapping because the aligner
+often choose not to map read portions that map very distantly.
+Graphs allow incorporating known variants, including large ones,
+and then mapping directly to these. Constructing graph genomes and operating on them
+has historically been difficult and time-consuming, however.
+
+We present a set of cloud-based workflows &mdash; composed of existing optimized tools &mdash; to
+construct graphs containing structural variants and map reads to them. These workflows allow users to take
+arbitrary SV calls, construct a graph, and map arbitrary reads to these graphs. This workflow is designed to
+return results as fast as possible.
 
 ## Implementation
+`super-minityper` is implemented as a DNAnexus cloud applet. There are analgous WDL files for performing all analyses as well.
 
-TODO: describe implementation
+The general workflow(s) are outlined in the below figure:
+![](docs/images/overview.png)
+
+A graph can be constructed from either a FASTA reference genome and structural variant calls (in the VCF format) or
+a set of long reads, which are aligned and assembled using read-read pairwise alignment and the [seqwish variation graph inducer](https://github.com/ekg/seqwish).
 
 ## Docker images:
 
 ### ncbicodeathons/superminityper:0.1-cpu
 
 The image includes the following tools:
-- [minmap2](https://github.com/lh3/minimap2)
+- [minimap2](https://github.com/lh3/minimap2)
 - [minigraph](https://github.com/lh3/minigraph)
 - [seqwish](https://github.com/ekg/seqwish)
 - [svaha2](https://github.com/edawson/svaha2)
 - [fpa](https://github.com/natir/fpa)
 
-Dockerfile is avaialable at [here](https://github.com/NCBI-Codeathons/super-minityper/blob/master/build/docker/Dockerfile)
+Dockerfile is available at [here](https://github.com/NCBI-Codeathons/super-minityper/blob/master/build/docker/Dockerfile)
 
 **Build from source code**
 
@@ -59,7 +87,7 @@ help(fastaio.write_fasta)
 #       None.
 ```
 
-Dockerfile is avaialable at [here](https://github.com/NCBI-Codeathons/super-minityper/blob/master/build/docker/Dockerfile)
+Dockerfile is available at [here](https://github.com/NCBI-Codeathons/super-minityper/blob/master/build/docker/Dockerfile)
 
 **Build from source code**
 
@@ -114,15 +142,25 @@ Dockerfile for `erictdawson/base`: https://github.com/edawson/dawdl/blob/master/
 minigraph (dockerhub): `erictdawson/minigraph`
 
 ## svaha2: build graphs for SVs in GFA (from FASTA and VCF)
-
-TODO: description of tool
+[svaha2](https://github.com/edawson/svaha2) is a C++ tool for quickly generating simple
+structural variation graphs from a reference genome and a set of variants a VCF file.
+It does this using a construction algorithm that is designed to operate in time linear to the
+number of breakpoints. It also prioritizes efficient use of RAM.
 
 source code: https://github.com/edawson/svaha2
-Docs are in README and in Eric Dawson's brain.
 
-TODO: Download Eric Dawson's brain
+The full algorithm is described in the svaha2 repository, but the main innovation is that
+pre-calculating the breakpoints (and sorting them) allows one to
+generate a graph with a coordinated ID space without requiring caching any of the graph in memory.
 
-Output should be GFA1. Easily converted to GFA2 with https://github.com/edawson/gfakluge
+The output of svaha2 is a graph described in GFA v1.0.
+
+## minigraph: align reads to GFA graphs
+[minigraph](https://github.com/lh3/minigraph) provides an experimental
+read-to-graph mapper. We map reads to the GFA v1.0 graph output by svaha2.
+This enables fast, push-button read-to-variants alignment with just
+a FASTA reference, a VCF containing SVs, and a FASTA/Q readset.
+
 
 ## minimap2 + seqwish: build de novo graphs
 
@@ -152,7 +190,7 @@ The filtered PAF, along with the reads, is then passed into `seqwish` to generat
 
 The WDL files for this pipeline are in [minimap2 WDL](wdl/SuperMiniTyper_minimap2.wdl) and [seqwish WDL](wdl/SuperMiniTyper_seqwish.wdl).
 
-### Future Direction
+### Future Directions
 A GPU accelerated implementation of minimap2 is under development in the Clara Genomics Analysis SDK.
 
 source: https://github.com/clara-genomics/ClaraGenomicsAnalysis
