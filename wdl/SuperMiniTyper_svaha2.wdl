@@ -11,7 +11,7 @@ task SuperMiniTyper_svaha2 {
   }
 
   runtime {
-     docker: "gigony/super-minityper:0.1-cpu"
+     docker: "ncbicodeathons/superminityper:0.1-cpu"
      cpu : 1
      memory : "24 GB"
      preemptible : 2
