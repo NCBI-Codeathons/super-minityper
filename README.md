@@ -163,6 +163,11 @@ read-to-graph mapper. We map reads to the GFA v1.0 graph output by svaha2.
 This enables fast, push-button read-to-variants alignment with just
 a FASTA reference, a VCF containing SVs, and a FASTA/Q readset.
 
+source code: https://github.com/lh3/minigraph
+
+GAF (output) format: https://github.com/lh3/gfatools/blob/master/doc/rGFA.md#the-graph-alignment-format-gaf
+
+
 
 ## minimap2 + seqwish: build de novo graphs
 
@@ -202,17 +207,5 @@ for faster overlap generation.
 
 An experimental WDL file for using `cudamapper` has been made avaialble in [cudamapper WDL](wdl/SuperMiniTyper_cudamapper.wdl).
 
-## minigraph: map reads to graph
-
-TODO: description of tool
-
-source code: https://github.com/lh3/minigraph
-
-GAF (output) format: https://github.com/lh3/gfatools/blob/master/doc/rGFA.md#the-graph-alignment-format-gaf
-
-
-## Workflow
-
-![](docs/images/workflow.png)
 
 
