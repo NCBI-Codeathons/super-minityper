@@ -170,6 +170,14 @@ source code: https://github.com/lh3/minigraph
 
 GAF (output) format: https://github.com/lh3/gfatools/blob/master/doc/rGFA.md#the-graph-alignment-format-gaf
 
+## GAF analysis
+Once we have the GAF output (alignments of reads to a graph), we do some basic analysis of the contents of the GAF
+file using scripts under the `analysis` folder.
+
+We are starting with simple counts such as number of alignments, and a breakdown of how well the queries are aligned
+to the graph in each alignment.
+
+The `gaf.py` script can be extended to understand the GAF structure in more depth.
 
 ## Workflow
 
