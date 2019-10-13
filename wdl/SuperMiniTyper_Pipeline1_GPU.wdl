@@ -8,10 +8,12 @@ task Pipeline1_GPU_cudamapper {
   Int indexSize = 10000
   Int targetIndexSize = 10000
 
+  Int dropLengthLower = 10000
+
   String outbase = basename(inputFASTQ)
 
   command {
-    cudamapper -k ${kmerSize} -w ${windowSize} -i ${indexSize} -t ${targetIndexSize} ${inputFASTQ} ${inputFASTQ} > ${outbase}.paf
+    cudamapper -k ${kmerSize} -w ${windowSize} -i ${indexSize} -t ${targetIndexSize} ${inputFASTQ} ${inputFASTQ} | fpa drop -l ${dropLengthLower} > ${outbase}.paf
   }
 
   runtime {
