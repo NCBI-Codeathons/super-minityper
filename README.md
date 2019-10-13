@@ -214,5 +214,13 @@ for faster overlap generation.
 
 An experimental WDL file for using `cudamapper` has been made avaialble in [cudamapper WDL](wdl/SuperMiniTyper_cudamapper.wdl).
 
+## GAF analysis
+Once we have the GAF output (alignments of reads to a graph), we do some basic analysis of the contents of the GAF
+file using scripts under the `analysis` folder.
+
+We are starting with simple counts such as number of alignments, and a breakdown of how well the queries are aligned
+to the graph in each alignment.
+
+The `gaf.py` script can be extended to understand the GAF structure in more depth.
 
 
