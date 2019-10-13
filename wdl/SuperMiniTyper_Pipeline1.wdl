@@ -7,7 +7,7 @@ task Pipeline1_minimap2 {
   String outbase = basename(inputFASTQ)
 
   command {
-    minimap2 ${inputFASTQ} ${inputFASTQ} -c -X | fpa drop -l ${dropLengthLower} > ${outbase}.paf
+    minimap2 ${inputFASTQ} ${inputFASTQ} -t ${threads} -c -X | fpa drop -l ${dropLengthLower} > ${outbase}.paf
   }
 
   runtime {
