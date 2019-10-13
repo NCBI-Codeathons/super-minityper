@@ -14,16 +14,18 @@
 
 `super-minityper` is a set of cloud-based workflows for constructing SV graphs and mapping reads to them.
 
-Structural variants frustrate linear mapping because the aligner
-often choose not to map read portions that map very distantly.
+Structural variants frustrate read mapping because aligners
+often choose not to map read portions which map very distantly.
 Graphs allow incorporating known variants, including large ones,
-and then mapping directly to these. Constructing graph genomes and operating on them
-has historically been difficult and time-consuming, however.
+and then mapping directly to these. While this has been shown to reduce reference bias and improve
+read mappings when a sample contains variants in the graph,
+constructing graph genomes and operating on them
+has historically been difficult and time-consuming.
 
-We present a set of cloud-based workflows &mdash; composed of existing optimized tools &mdash; to
+We present a set of cloud-based workflows &mdash; composed mostly of preexisting and optimized tools &mdash; to
 construct graphs containing structural variants and map reads to them. These workflows allow users to take
-arbitrary SV calls, construct a graph, and map arbitrary reads to these graphs. This workflow is designed to
-return results as fast as possible.
+arbitrary SV calls, construct a graph, and map reads to these graphs. This workflow prioritizes ease-of-use and
+speed, ingesting common input formats and returning results in minutes on commodity cloud VMs.
 
 ## Implementation
 `super-minityper` is implemented as a DNAnexus cloud applet. There are analgous WDL files for performing all analyses as well.
