@@ -229,23 +229,89 @@ RUN git clone --recursive -b master --single-branch https://github.com/edawson/s
 	&& git reset --hard ${SVAHA2_VERSION} \
     && make
 
+###############################################################################
+# fpa : https://github.com/natir/fpa
+###############################################################################
+FROM ${LINUX_DISTRO}:${LINUX_DISTRO_VERSION} AS fpa
+
+ARG FPA_VERSION=v0.5
+ENV FPA_VERSION=${FPA_VERSION}
+
+# Ensure apt-get won't prompt for selecting options
+ENV DEBIAN_FRONTEND=noninteractive
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+
+# Install dependencies for fpa
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        wget \
+        git \
+        build-essential \
+        make \
+        zlib1g-dev \
+        libbz2-dev \
+        liblzma-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+#============================
+# rust for fpa
+#   From 1.38-stretch : https://github.com/rust-lang/docker-rust/blob/master/1.38.0/stretch/Dockerfile
+#============================
+
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_VERSION=1.38.0
+
+RUN set -eux; \
+    dpkgArch="$(dpkg --print-architecture)"; \
+    case "${dpkgArch##*-}" in \
+        amd64) rustArch='x86_64-unknown-linux-gnu'; rustupSha256='36285482ae5c255f2decfab27d32ba19465804cb3ddf5a23e6ff2a7b0f6e0250' ;; \
+        armhf) rustArch='armv7-unknown-linux-gnueabihf'; rustupSha256='cb20e54566d4b13434dea1776a961cf7f97afcc292cb4b0fec533503dd2434d0' ;; \
+        arm64) rustArch='aarch64-unknown-linux-gnu'; rustupSha256='58e19ae12101103ccc50b04a2579b9238163f87a27da5078cefc900098f257ab' ;; \
+        i386) rustArch='i686-unknown-linux-gnu'; rustupSha256='d3c42fb8b25f87eb049b6177611eea7d4fd51273de4113706f43cccf5610cfc7' ;; \
+        *) echo >&2 "unsupported architecture: ${dpkgArch}"; exit 1 ;; \
+    esac; \
+    url="https://static.rust-lang.org/rustup/archive/1.19.0/${rustArch}/rustup-init"; \
+    wget "$url"; \
+    echo "${rustupSha256} *rustup-init" | sha256sum -c -; \
+    chmod +x rustup-init; \
+    ./rustup-init -y --no-modify-path --default-toolchain $RUST_VERSION; \
+    rm rustup-init; \
+    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+    rustup --version; \
+    cargo --version; \
+    rustc --version;
+
+WORKDIR /opt/natir/fpa/build
+
+RUN git clone --recursive -b ${FPA_VERSION} --single-branch https://github.com/natir/fpa.git \
+    && cd fpa \
+    && cargo build \
+    && cargo test \
+    && cargo install
 
 ###############################################################################
 # dxWDL builder
 ###############################################################################
 FROM openjdk:8u222 AS dx-wdl-builder
 
-ARG DXWDL_VERSION=1.00
+ARG DXWDL_VERSION=1.32
 ENV DXWDL_VERSION=${DXWDL_VERSION}
+
+ARG DXTOOLKIT_VERSION=0.288.0
+ENV DXTOOLKIT_VERSION=${DXTOOLKIT_VERSION}
+ARG DXTOOLKIT_PLATFORM=ubuntu-16.04-amd64
+ENV DXTOOLKIT_PLATFORM=${DXTOOLKIT_PLATFORM}
 
 WORKDIR /workspace
 
-RUN wget https://dnanexus-sdk.s3.amazonaws.com/dx-toolkit-v0.288.0-ubuntu-16.04-amd64.tar.gz \
+RUN wget https://dnanexus-sdk.s3.amazonaws.com/dx-toolkit-v${DXTOOLKIT_VERSION}-${DXTOOLKIT_PLATFORM}.tar.gz \
 	&& tar -xzf dx-toolkit*.tar.gz \
-	&& wget https://github.com/dnanexus/dxWDL/releases/download/$DXWDL_VERSION/dxWDL-$DXWDL_VERSION.jar \
-    && chmod +x dxWDL-$DXWDL_VERSION.jar \
-	&& mv dxWDL-$DXWDL_VERSION.jar dxWDL.jar
-
+	&& wget https://github.com/dnanexus/dxWDL/releases/download/v$DXWDL_VERSION/dxWDL-v$DXWDL_VERSION.jar \
+    && chmod +x dxWDL-v$DXWDL_VERSION.jar \
+	&& mv dxWDL-v$DXWDL_VERSION.jar dxWDL.jar
 
 ###############################################################################
 # Super Minityper CPU
@@ -265,8 +331,10 @@ COPY --from=minigraph /opt/lh3/minigraph/build/minigraph /opt/lh3/minigraph/bin/
 COPY --from=seqwish /opt/ekg/seqwish/build/seqwish/bin/seqwish /opt/ekg/seqwish/bin/
 # Copy svaha2 binary
 COPY --from=svaha2 /opt/edawson/svaha2/build/svaha2 /opt/edawson/svaha2/bin/
+# Copy fpa binary
+COPY --from=fpa /usr/local/cargo/bin/fpa /opt/natir/fpa/bin/
 
-ENV PATH=/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:/opt/edawson/svaha2/bin:${PATH}
+ENV PATH=/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:/opt/edawson/svaha2/bin:/opt/natir/fpa/bin:${PATH}
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -290,7 +358,7 @@ ENV LANG=C.UTF-8
 
 # Set environment variables
 ENV CUDA_HOME=/usr/local/cuda
-ENV PATH=/opt/nvidia/clara-genomics/bin:/opt/nvidia/clara-genomics/racon-gpu/bin:/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:/opt/edawson/svaha2/bin:${PATH}
+ENV PATH=/opt/nvidia/clara-genomics/bin:/opt/nvidia/clara-genomics/racon-gpu/bin:/opt/lh3/minimap2/bin:/opt/lh3/minigraph/bin:/opt/ekg/seqwish/bin:/opt/edawson/svaha2/bin:/opt/natir/fpa/bin:${PATH}
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/lib:/opt/nvidia/clara-genomics/lib
 
 WORKDIR /workspace
@@ -313,6 +381,8 @@ COPY --from=minigraph /opt/lh3/minigraph/build/minigraph /opt/lh3/minigraph/bin/
 COPY --from=seqwish /opt/ekg/seqwish/build/seqwish/bin/seqwish /opt/ekg/seqwish/bin/
 # Copy svaha2 binary
 COPY --from=svaha2 /opt/edawson/svaha2/build/svaha2 /opt/edawson/svaha2/bin/
+# Copy fpa binary
+COPY --from=fpa /usr/local/cargo/bin/fpa /opt/natir/fpa/bin/
 
 # Correct binary locations for racon_wrapper
 RUN sed -i -e 's#/opt/nvidia/clara-genomics/build/racon-gpu/build/bin/racon#/opt/nvidia/clara-genomics/racon-gpu/bin/racon#' \
