@@ -204,7 +204,17 @@ The filtered PAF, along with the reads, is then passed into `seqwish` to generat
 
 The WDL files for this pipeline are in [minimap2 WDL](wdl/SuperMiniTyper_minimap2.wdl) and [seqwish WDL](wdl/SuperMiniTyper_seqwish.wdl).
 
-### Future Directions
+## GAF analysis
+Once we have the GAF output (alignments of reads to a graph), we do some basic analysis of the contents of the GAF
+file using scripts under the `analysis` folder.
+
+We are starting with simple counts such as number of alignments, and a breakdown of how well the queries are aligned
+to the graph in each alignment.
+
+The `gaf.py` script can be extended to understand the GAF structure in more depth.
+
+## Future Directions
+### GPU-accelerated minimap2
 A GPU accelerated implementation of minimap2 is under development in the Clara Genomics Analysis SDK.
 
 source: https://github.com/clara-genomics/ClaraGenomicsAnalysis
@@ -214,13 +224,23 @@ for faster overlap generation.
 
 An experimental WDL file for using `cudamapper` has been made avaialble in [cudamapper WDL](wdl/SuperMiniTyper_cudamapper.wdl).
 
-## GAF analysis
-Once we have the GAF output (alignments of reads to a graph), we do some basic analysis of the contents of the GAF
-file using scripts under the `analysis` folder.
+### Assembly graph statistics with GFAKluge
+We don't report any intermediate statistics on our assembly graph from `minimap2/cudamapper` and `seqwish`.
+However, this information would be useful. Adding a DNAnexus cloud applet for [GFAKluge](https://github.com/edawson/gfakluge)
+would allow users to see the maximum graph length, contig N50, etc.
 
-We are starting with simple counts such as number of alignments, and a breakdown of how well the queries are aligned
-to the graph in each alignment.
+### Other read-to-graph mappers
+`minigraph` is still an experimental mapper. Other mappers such as [vg](https://github.com/vgteam/vg) have 
+been used more extensively and may provide different results. Additional mappers could be added easily by incorporating
+a new applet, assuming the mapper can consume GFA.
 
-The `gaf.py` script can be extended to understand the GAF structure in more depth.
+### End-to-end SV genotyping using super-minityper
+The end goal of `super-minityper` is to be a fast, easy-to-use SV genotyper.
+To accomlish this, we need to be able to translate between node IDs in the graph
+and variants in the GFA graph. This will require extending `svaha2` to incorporate variant
+information into its output.
+
+We also need to extend the output of `svaha2` to include the necessary tags for full rGFA compatibility.
+This enables stable, reference-relative mappings and annotations and better compatibility with minigraph.
 
 
