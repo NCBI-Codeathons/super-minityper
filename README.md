@@ -24,8 +24,8 @@ has historically been difficult and time-consuming.
 
 We present a set of cloud-based workflows &mdash; composed mostly of preexisting and optimized tools &mdash; to
 construct graphs containing structural variants and map reads to them. These workflows allow users to take
-arbitrary SV calls, construct a graph, and map arbitrary reads to these graphs. This workflow is designed to
-return results as fast as possible.
+arbitrary SV calls, construct a graph, and map reads to these graphs. This workflow prioritizes ease-of-use and
+speed, ingesting common input formats and returning results in minutes on commodity cloud VMs.
 
 ## Implementation
 `super-minityper` is implemented as a DNAnexus cloud applet. There are analgous WDL files for performing all analyses as well.
