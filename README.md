@@ -149,6 +149,9 @@ structural variation graphs from a reference genome and a set of variants a VCF 
 It does this using a construction algorithm that is designed to operate in time linear to the
 number of breakpoints. It also prioritizes efficient use of RAM.
 
+![](docs/images/svaha2.png)
+
+
 source code: https://github.com/edawson/svaha2
 
 The full algorithm is described in the svaha2 repository, but the main innovation is that
@@ -156,6 +159,7 @@ pre-calculating the breakpoints (and sorting them) allows one to
 generate a graph with a coordinated ID space without requiring caching any of the graph in memory.
 
 The output of svaha2 is a graph described in GFA v1.0.
+
 
 ## minigraph: align reads to GFA graphs
 [minigraph](https://github.com/lh3/minigraph) provides an experimental
@@ -173,6 +177,9 @@ GAF (output) format: https://github.com/lh3/gfatools/blob/master/doc/rGFA.md#the
 
 We use the minimap2 + seqwish flow to generate de novo graphs in the GFA1 format. This serves
 as the basis for aligning new reads to a reference graph.
+
+![](docs/images/seqwish.png)
+
 
 Source code:
 
