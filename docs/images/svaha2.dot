@@ -1,0 +1,16 @@
+digraph{
+label = "svaha2"
+rankdir=LR;
+
+refFA[shape="box", label="Reference (FASTA)"];
+svahaVCF[shape="box", label="SV calls (VCF)"];
+svahaGFA[shape="box", label="SV graph (GFA)"];
+
+svaha[shape="parallelogram", style="rounded", label="svaha2"];
+
+
+refFA -> svaha;
+svahaVCF -> svaha;
+svaha -> svahaGFA;
+
+}

@@ -1,0 +1,21 @@
+digraph{
+label = "Read overlapping + seqwish"
+rankdir=LR;
+
+seqwishGFA[shape="box", label="Seqwish Graph (GFA)"];
+readsFA[shape="box", label="Reads (FASTA/FASTQ)"];
+
+seqwish[shape="parallelogram", style="rounded", label="seqwish"];
+minimap2[shape="parallelogram", style="rounded", label="minimap2", color = "grey"];
+fpa[shape="parallelogram", style="rounded", label="fpa (filter overlaps)"];
+cudamapper[shape="parallelogram", style="rounded", label="cudamapper", color="red"];
+
+
+readsFA -> cudamapper;
+readsFA -> minimap2;
+cudamapper -> fpa;
+minimap2 -> fpa;
+fpa -> seqwish;
+seqwish -> seqwishGFA;
+
+}
