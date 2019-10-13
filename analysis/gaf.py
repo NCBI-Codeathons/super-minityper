@@ -52,7 +52,7 @@ path_end_pos = []
 # Attempt to classify quality of mapping
 gfa = GAF(inputFile)
 for alignment in gfa.alignments:
-    align_perc = float(alignment.alignBlockLen) / float(alignment.querySeqLen)
+    align_perc = float(alignment.alignBlockLen) / float(alignment.pathLen)
     if (align_perc > 0.9):
         align_perc_90 += 1
     elif (align_perc > 0.5):
@@ -89,6 +89,7 @@ bucket_boundaries = [range_start + bucket_size * i for i in range(buckets + 1)]
 print("Total alignments {}\n".format(len(gfa)))
 
 print("Number of alignments with path start positions in each window -")
+print("TODO: This metrics makes more sense when we have the overall graph length")
 for i in range(len(bucket_counts)):
     print("{}:{} - {} alignment starts".format(bucket_boundaries[i], bucket_boundaries[i + 1], bucket_counts[i]))
 
