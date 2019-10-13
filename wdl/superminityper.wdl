@@ -14,7 +14,7 @@ task minigraph{
   command{
       minigraph -x ${preset} -t ${threads} -w ${windowSize} -k ${kmerSize} ${inputGFA} ${inputFASTQ} > ${outbase}.gaf
   }
-  
+
   runtime{
     docker: "erictdawson/minigraph"
     cpu : "${threads}"
