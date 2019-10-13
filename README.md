@@ -27,6 +27,8 @@ construct graphs containing structural variants and map reads to them. These wor
 arbitrary SV calls, construct a graph, and map reads to these graphs. This workflow prioritizes ease-of-use and
 speed, ingesting common input formats and returning results in minutes on commodity cloud VMs.
 
+Relevant slides are [here](https://docs.google.com/presentation/d/1yAzdIZaKeMpVARjlKLK2RKwRHnZj9lpa7HUfeFk-A5I/edit#slide=id.p) and in the docs directory.
+
 ## Implementation
 `super-minityper` is implemented as a DNAnexus cloud applet. There are analgous WDL files for performing all analyses as well.
 
