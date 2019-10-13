@@ -1,16 +1,17 @@
 task Pipeline1_minimap2 {
   File inputFASTQ
+  Int dropLengthLower = 10000
   Int diskGB
   Int threads = 8
 
   String outbase = basename(inputFASTQ)
 
   command {
-    minimap2 ${inputFASTQ} ${inputFASTQ} -c -X > ${outbase}.paf
+    minimap2 ${inputFASTQ} ${inputFASTQ} -c -X | fpa drop -l ${dropLengthLower} > ${outbase}.paf
   }
 
   runtime {
-    docker: "gigony/super-minityper:0.1-cpu"
+    docker: "ncbicodeathons/superminityper:0.1-cpu"
     cpu : "${threads}"
     memory : "16 GB"
     disk : "local-disk " + diskGB + " HDD"
@@ -37,7 +38,7 @@ task Pipeline1_seqwish {
   }
 
   runtime {
-    docker: "gigony/super-minityper:0.1-cpu"
+    docker: "ncbicodeathons/superminityper:0.1-cpu"
     cpu : "${threads}"
     memory : "16 GB"
     disk : "local-disk " + diskGB + " HDD"
@@ -45,7 +46,7 @@ task Pipeline1_seqwish {
   }
 
   output {
-    File outputPAF = "${outbase}.gfa"
+    File outputGFA = "${outbase}.gfa"
     File outputGRAPH = "${outbase}.graph"
   }
 

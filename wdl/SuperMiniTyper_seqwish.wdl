@@ -11,7 +11,7 @@ task SuperMiniTyper_seqwish {
   }
 
   runtime {
-    docker: "gigony/super-minityper:0.1-cpu"
+    docker: "ncbicodeathons/superminityper:0.1-cpu"
     cpu : "${threads}"
     memory : "16 GB"
     disk : "local-disk " + diskGB + " HDD"
@@ -19,7 +19,7 @@ task SuperMiniTyper_seqwish {
   }
 
   output {
-    File outputPAF = "${outbase}.gfa"
+    File outputGFA = "${outbase}.gfa"
     File outputGRAPH = "${outbase}.graph"
   }
 }

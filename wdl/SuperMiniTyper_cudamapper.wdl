@@ -15,7 +15,7 @@ task SuperMiniTyper_cudamapper {
   }
 
   runtime {
-    docker: "gigony/super-minityper:0.1"
+    docker: "ncbicodeathons/superminityper:0.1"
     cpu : "${threads}"
     memory : "16 GB"
     disk : "local-disk " + diskGB + " HDD"
